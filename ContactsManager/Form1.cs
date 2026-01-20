@@ -311,7 +311,7 @@ namespace ContactsManager
             cmbGender.SelectedItem = contact.Gender;
             dtpBirthDate.Value = contact.BirthDate ?? DateTime.Today;
 
-            lblStatus.Text = $"Selected: {contact.FullName} | Email: {contact.Email}";
+            DisplayStatus($"Selected: {contact.FullName} | Email: {contact.Email}");
         }
 
         private void btnExportCsv_Click(object sender, EventArgs e)
