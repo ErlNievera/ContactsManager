@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             btnAddContact = new Button();
             txtFullName = new TextBox();
             lblFullName = new Label();
@@ -55,18 +56,19 @@
             toolStrip1 = new ToolStrip();
             lblStatus = new ToolStripLabel();
             lblCounts = new ToolStripLabel();
-            errorProvider = new ToolStripLabel();
             gbFilteringSearching = new GroupBox();
-            cmbFilterGender = new ComboBox();
-            lblFilterGender = new Label();
-            textBox1 = new TextBox();
-            lblSearch = new Label();
-            btnApplyFilter = new Button();
             btnResetFilter = new Button();
+            btnApplyFilter = new Button();
+            lblSearch = new Label();
+            txtSearch = new TextBox();
+            lblFilterGender = new Label();
+            cmbFilterGender = new ComboBox();
+            errorProvider = new ErrorProvider(components);
             ((System.ComponentModel.ISupportInitialize)dgContacts).BeginInit();
             gbActionManagement.SuspendLayout();
             toolStrip1.SuspendLayout();
             gbFilteringSearching.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
             SuspendLayout();
             // 
             // btnAddContact
@@ -77,6 +79,7 @@
             btnAddContact.TabIndex = 0;
             btnAddContact.Text = "Add";
             btnAddContact.UseVisualStyleBackColor = true;
+            btnAddContact.Click += btnAddContact_Click;
             // 
             // txtFullName
             // 
@@ -168,17 +171,21 @@
             btnUpdateContact.TabIndex = 11;
             btnUpdateContact.Text = "Update";
             btnUpdateContact.UseVisualStyleBackColor = true;
+            btnUpdateContact.Click += btnUpdateContact_Click;
             // 
             // dgContacts
             // 
             dgContacts.AllowUserToAddRows = false;
+            dgContacts.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dgContacts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgContacts.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dgContacts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgContacts.Columns.AddRange(new DataGridViewColumn[] { colFullName, colEmail, colPhone, colGender, colBirthDate, colCreatedAt });
             dgContacts.Location = new Point(414, 98);
             dgContacts.Name = "dgContacts";
             dgContacts.ReadOnly = true;
             dgContacts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgContacts.Size = new Size(546, 374);
+            dgContacts.Size = new Size(669, 450);
             dgContacts.TabIndex = 13;
             // 
             // colFullName
@@ -225,7 +232,7 @@
             gbActionManagement.Controls.Add(btnRemoveSelected);
             gbActionManagement.Location = new Point(23, 308);
             gbActionManagement.Name = "gbActionManagement";
-            gbActionManagement.Size = new Size(368, 138);
+            gbActionManagement.Size = new Size(373, 222);
             gbActionManagement.TabIndex = 14;
             gbActionManagement.TabStop = false;
             gbActionManagement.Text = "Action Management";
@@ -238,6 +245,7 @@
             btnExportCsv.TabIndex = 3;
             btnExportCsv.Text = "Export";
             btnExportCsv.UseVisualStyleBackColor = true;
+            btnExportCsv.Click += btnExportCsv_Click;
             // 
             // chkConfirmDelete
             // 
@@ -257,6 +265,7 @@
             btnClearAll.TabIndex = 1;
             btnClearAll.Text = "Clear All";
             btnClearAll.UseVisualStyleBackColor = true;
+            btnClearAll.Click += btnClearAll_Click;
             // 
             // btnRemoveSelected
             // 
@@ -266,14 +275,15 @@
             btnRemoveSelected.TabIndex = 0;
             btnRemoveSelected.Text = "Remove Selected";
             btnRemoveSelected.UseVisualStyleBackColor = true;
+            btnRemoveSelected.Click += btnRemoveSelected_Click;
             // 
             // toolStrip1
             // 
             toolStrip1.Dock = DockStyle.Bottom;
-            toolStrip1.Items.AddRange(new ToolStripItem[] { lblStatus, lblCounts, errorProvider });
-            toolStrip1.Location = new Point(0, 485);
+            toolStrip1.Items.AddRange(new ToolStripItem[] { lblStatus, lblCounts });
+            toolStrip1.Location = new Point(0, 654);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(981, 25);
+            toolStrip1.Size = new Size(1150, 25);
             toolStrip1.TabIndex = 15;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -281,8 +291,7 @@
             // 
             lblStatus.Font = new Font("Georgia", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(44, 22);
-            lblStatus.Text = "Status";
+            lblStatus.Size = new Size(0, 22);
             // 
             // lblCounts
             // 
@@ -290,52 +299,39 @@
             lblCounts.Name = "lblCounts";
             lblCounts.Size = new Size(0, 22);
             // 
-            // errorProvider
-            // 
-            errorProvider.Font = new Font("Georgia", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            errorProvider.ForeColor = Color.Red;
-            errorProvider.Name = "errorProvider";
-            errorProvider.Size = new Size(0, 22);
-            // 
             // gbFilteringSearching
             // 
             gbFilteringSearching.Controls.Add(btnResetFilter);
             gbFilteringSearching.Controls.Add(btnApplyFilter);
             gbFilteringSearching.Controls.Add(lblSearch);
-            gbFilteringSearching.Controls.Add(textBox1);
+            gbFilteringSearching.Controls.Add(txtSearch);
             gbFilteringSearching.Controls.Add(lblFilterGender);
             gbFilteringSearching.Controls.Add(cmbFilterGender);
             gbFilteringSearching.Location = new Point(450, 12);
             gbFilteringSearching.Name = "gbFilteringSearching";
-            gbFilteringSearching.Size = new Size(478, 80);
+            gbFilteringSearching.Size = new Size(576, 80);
             gbFilteringSearching.TabIndex = 16;
             gbFilteringSearching.TabStop = false;
             gbFilteringSearching.Text = "Filtering Searching";
             // 
-            // cmbFilterGender
+            // btnResetFilter
             // 
-            cmbFilterGender.FormattingEnabled = true;
-            cmbFilterGender.Items.AddRange(new object[] { "Male", "Female", "Non-binary", "Prefer not to say" });
-            cmbFilterGender.Location = new Point(121, 20);
-            cmbFilterGender.Name = "cmbFilterGender";
-            cmbFilterGender.Size = new Size(163, 24);
-            cmbFilterGender.TabIndex = 0;
+            btnResetFilter.Location = new Point(445, 32);
+            btnResetFilter.Name = "btnResetFilter";
+            btnResetFilter.Size = new Size(111, 26);
+            btnResetFilter.TabIndex = 5;
+            btnResetFilter.Text = "Reset Filter";
+            btnResetFilter.UseVisualStyleBackColor = true;
             // 
-            // lblFilterGender
+            // btnApplyFilter
             // 
-            lblFilterGender.AutoSize = true;
-            lblFilterGender.Location = new Point(22, 23);
-            lblFilterGender.Name = "lblFilterGender";
-            lblFilterGender.Size = new Size(93, 16);
-            lblFilterGender.TabIndex = 1;
-            lblFilterGender.Text = "Filter Gender:";
-            // 
-            // textBox1
-            // 
-            textBox1.Location = new Point(121, 50);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(163, 22);
-            textBox1.TabIndex = 2;
+            btnApplyFilter.Location = new Point(318, 32);
+            btnApplyFilter.Name = "btnApplyFilter";
+            btnApplyFilter.Size = new Size(111, 26);
+            btnApplyFilter.TabIndex = 4;
+            btnApplyFilter.Text = "Apply Filter";
+            btnApplyFilter.UseVisualStyleBackColor = true;
+            btnApplyFilter.Click += btnApplyFilter_Click;
             // 
             // lblSearch
             // 
@@ -346,30 +342,41 @@
             lblSearch.TabIndex = 3;
             lblSearch.Text = "Search:";
             // 
-            // btnApplyFilter
+            // txtSearch
             // 
-            btnApplyFilter.Location = new Point(322, 15);
-            btnApplyFilter.Name = "btnApplyFilter";
-            btnApplyFilter.Size = new Size(111, 26);
-            btnApplyFilter.TabIndex = 4;
-            btnApplyFilter.Text = "Apply Filter";
-            btnApplyFilter.UseVisualStyleBackColor = true;
+            txtSearch.Location = new Point(121, 50);
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(163, 22);
+            txtSearch.TabIndex = 2;
             // 
-            // btnResetFilter
+            // lblFilterGender
             // 
-            btnResetFilter.Location = new Point(321, 47);
-            btnResetFilter.Name = "btnResetFilter";
-            btnResetFilter.Size = new Size(111, 26);
-            btnResetFilter.TabIndex = 5;
-            btnResetFilter.Text = "Reset Filter";
-            btnResetFilter.UseVisualStyleBackColor = true;
+            lblFilterGender.AutoSize = true;
+            lblFilterGender.Location = new Point(22, 23);
+            lblFilterGender.Name = "lblFilterGender";
+            lblFilterGender.Size = new Size(93, 16);
+            lblFilterGender.TabIndex = 1;
+            lblFilterGender.Text = "Filter Gender:";
+            // 
+            // cmbFilterGender
+            // 
+            cmbFilterGender.FormattingEnabled = true;
+            cmbFilterGender.Items.AddRange(new object[] { "Male", "Female", "Non-binary", "Prefer not to say" });
+            cmbFilterGender.Location = new Point(121, 20);
+            cmbFilterGender.Name = "cmbFilterGender";
+            cmbFilterGender.Size = new Size(163, 24);
+            cmbFilterGender.TabIndex = 0;
+            // 
+            // errorProvider
+            // 
+            errorProvider.ContainerControl = this;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 16F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.LightSlateGray;
-            ClientSize = new Size(981, 510);
+            ClientSize = new Size(1150, 679);
             Controls.Add(gbFilteringSearching);
             Controls.Add(toolStrip1);
             Controls.Add(gbActionManagement);
@@ -390,6 +397,7 @@
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "ContactsManager";
+            WindowState = FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)dgContacts).EndInit();
             gbActionManagement.ResumeLayout(false);
             gbActionManagement.PerformLayout();
@@ -397,6 +405,7 @@
             toolStrip1.PerformLayout();
             gbFilteringSearching.ResumeLayout(false);
             gbFilteringSearching.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -428,15 +437,15 @@
         private ToolStrip toolStrip1;
         private ToolStripLabel lblStatus;
         private ToolStripLabel lblCounts;
-        private ToolStripLabel errorProvider;
         private CheckBox chkConfirmDelete;
         private Button btnExportCsv;
         private GroupBox gbFilteringSearching;
-        private TextBox textBox1;
+        private TextBox txtSearch;
         private Label lblFilterGender;
         private ComboBox cmbFilterGender;
         private Label lblSearch;
         private Button btnResetFilter;
         private Button btnApplyFilter;
+        private ErrorProvider errorProvider;
     }
 }
