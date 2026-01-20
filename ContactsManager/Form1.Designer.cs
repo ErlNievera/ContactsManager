@@ -322,6 +322,7 @@
             btnResetFilter.TabIndex = 5;
             btnResetFilter.Text = "Reset Filter";
             btnResetFilter.UseVisualStyleBackColor = true;
+            btnResetFilter.Click += btnResetFilter_Click_1;
             // 
             // btnApplyFilter
             // 

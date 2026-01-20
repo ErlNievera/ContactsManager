@@ -25,7 +25,7 @@ namespace ContactsManager
         {
             _contactsSource.DataSource = _contacts;
             dgContacts.DataSource = _contactsSource;
-            
+
 
             dgContacts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgContacts.ReadOnly = true;
@@ -63,14 +63,14 @@ namespace ContactsManager
                 DataPropertyName = "BirthDate",
                 HeaderText = "Birth Date",
                 Width = 100,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" } 
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" }
             });
             dgContacts.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "CreatedAt",
                 HeaderText = "Created At",
                 Width = 120,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "g" } 
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "g" }
             });
         }
 
@@ -239,7 +239,7 @@ namespace ContactsManager
                     if (result != DialogResult.Yes)
                     {
                         DisplayStatus("Delete cancelled.");
-                        return; 
+                        return;
                     }
                 }
 
@@ -288,16 +288,6 @@ namespace ContactsManager
             _contactsSource.ResetBindings(false);
             UpdateCounts();
             DisplayStatus($"Filter applied ({filtered.Count} contacts).");
-        }
-
-        private void btnResetFilter_Click(object sender, EventArgs e)
-        {
-            _contactsSource.DataSource = _contacts;
-            _contactsSource.ResetBindings(false);
-            cmbFilterGender.SelectedIndex = 0;
-            txtSearch.Clear();
-            UpdateCounts();
-            DisplayStatus("Filter reset.");
         }
         private void dgContacts_SelectionChanged(object sender, EventArgs e)
         {
@@ -363,6 +353,16 @@ namespace ContactsManager
                     MessageBox.Show($"Error exporting CSV:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void btnResetFilter_Click_1(object sender, EventArgs e)
+        {
+            _contactsSource.DataSource = _contacts;
+            _contactsSource.ResetBindings(false);
+            cmbFilterGender.SelectedIndex = 0;
+            txtSearch.Clear();
+            UpdateCounts();
+            DisplayStatus("Filter reset.");
         }
     }
 }
