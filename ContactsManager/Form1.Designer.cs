@@ -187,6 +187,7 @@
             dgContacts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgContacts.Size = new Size(669, 450);
             dgContacts.TabIndex = 13;
+            dgContacts.SelectionChanged += dgContacts_SelectionChanged_1;
             // 
             // colFullName
             // 
@@ -256,6 +257,7 @@
             chkConfirmDelete.TabIndex = 2;
             chkConfirmDelete.Text = "Confirm Delete";
             chkConfirmDelete.UseVisualStyleBackColor = true;
+            chkConfirmDelete.CheckedChanged += chkConfirmDelete_CheckedChanged;
             // 
             // btnClearAll
             // 

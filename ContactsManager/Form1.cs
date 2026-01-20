@@ -7,10 +7,13 @@ namespace ContactsManager
     {
         private readonly BindingList<Contact> _contacts = new();
         private BindingSource _contactsSource = new();
+        private bool _suppressSelectionChanged = false;
+        private bool _userClickedRow = false;
         public Form1()
         {
             InitializeComponent();
-            InitializeDataGrid();
+            GridHelper.SetupContactsGrid(dgContacts, _contactsSource, _contacts);
+            dgContacts.ClearSelection();
 
             _contacts.Add(new Contact
             {
@@ -21,59 +24,6 @@ namespace ContactsManager
                 BirthDate = new DateTime(2004, 11, 5)
             });
         }
-        private void InitializeDataGrid()
-        {
-            _contactsSource.DataSource = _contacts;
-            dgContacts.DataSource = _contactsSource;
-
-
-            dgContacts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgContacts.ReadOnly = true;
-            dgContacts.AllowUserToAddRows = false;
-            dgContacts.AutoGenerateColumns = false;
-
-            dgContacts.Columns.Clear();
-
-            dgContacts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "FullName",
-                HeaderText = "Full Name",
-                Width = 150
-            });
-            dgContacts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Email",
-                HeaderText = "Email",
-                Width = 200
-            });
-            dgContacts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Phone",
-                HeaderText = "Phone",
-                Width = 120
-            });
-            dgContacts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Gender",
-                HeaderText = "Gender",
-                Width = 100
-            });
-            dgContacts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "BirthDate",
-                HeaderText = "Birth Date",
-                Width = 100,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "d" }
-            });
-            dgContacts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "CreatedAt",
-                HeaderText = "Created At",
-                Width = 120,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "g" }
-            });
-        }
-
         private void btnAddContact_Click(object sender, EventArgs e)
         {
             errorProvider.Clear();
@@ -186,6 +136,7 @@ namespace ContactsManager
             }
 
             var selected = dgContacts.SelectedRows[0].DataBoundItem as Contact;
+            if (selected == null) return;
 
             errorProvider.Clear();
 
@@ -199,6 +150,7 @@ namespace ContactsManager
                 DisplayStatus("Please fix validation errors.");
                 return;
             }
+            _suppressSelectionChanged = true;
 
             selected.FullName = txtFullName.Text.Trim();
             selected.Email = txtEmail.Text.Trim();
@@ -207,6 +159,9 @@ namespace ContactsManager
             selected.BirthDate = dtpBirthDate.Value;
 
             _contactsSource.ResetBindings(false);
+
+            _suppressSelectionChanged = false;
+
             UpdateCounts();
             DisplayStatus($"Updated: {selected.FullName}");
         }
@@ -219,42 +174,36 @@ namespace ContactsManager
                 return;
             }
 
-            if (chkConfirmDelete.Checked)
+            if (!ConfirmDelete())
             {
-                if (dgContacts.SelectedRows.Count == 0)
-                {
-                    DisplayStatus("No contact selected.");
-                    return;
-                }
-
-                if (chkConfirmDelete.Checked)
-                {
-                    var result = MessageBox.Show(
-                        "Are you sure you want to delete the selected contact(s)?",
-                        "Confirm Delete",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning
-                    );
-
-                    if (result != DialogResult.Yes)
-                    {
-                        DisplayStatus("Delete cancelled.");
-                        return;
-                    }
-                }
-
-                foreach (DataGridViewRow row in dgContacts.SelectedRows)
-                {
-                    var contact = row.DataBoundItem as Contact;
-                    if (contact != null)
-                        _contacts.Remove(contact);
-                }
-                _contactsSource.ResetBindings(false);
-                UpdateCounts();
-                DisplayStatus("Selected contact(s) removed.");
+                DisplayStatus("Delete cancelled.");
+                return;
             }
-        }
 
+            foreach (DataGridViewRow row in dgContacts.SelectedRows)
+            {
+                if (row.DataBoundItem is Contact contact)
+                    _contacts.Remove(contact);
+            }
+
+            _contactsSource.ResetBindings(false);
+            UpdateCounts();
+            DisplayStatus("Selected contact(s) removed.");
+        }
+        private bool ConfirmDelete()
+        {
+            if (!chkConfirmDelete.Checked)
+                return true;
+
+            var result = MessageBox.Show(
+                "Are you sure you want to delete the selected contact(s)?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            return result == DialogResult.Yes;
+        }
         private void btnClearAll_Click(object sender, EventArgs e)
         {
             if (_contacts.Count == 0)
@@ -288,20 +237,6 @@ namespace ContactsManager
             _contactsSource.ResetBindings(false);
             UpdateCounts();
             DisplayStatus($"Filter applied ({filtered.Count} contacts).");
-        }
-        private void dgContacts_SelectionChanged(object sender, EventArgs e)
-        {
-            if (dgContacts.SelectedRows.Count == 0) return;
-
-            var contact = dgContacts.SelectedRows[0].DataBoundItem as Contact;
-
-            txtFullName.Text = contact.FullName;
-            txtEmail.Text = contact.Email;
-            mtbPhone.Text = contact.Phone;
-            cmbGender.SelectedItem = contact.Gender;
-            dtpBirthDate.Value = contact.BirthDate ?? DateTime.Today;
-
-            DisplayStatus($"Selected: {contact.FullName} | Email: {contact.Email}");
         }
 
         private void btnExportCsv_Click(object sender, EventArgs e)
@@ -354,7 +289,6 @@ namespace ContactsManager
                 }
             }
         }
-
         private void btnResetFilter_Click_1(object sender, EventArgs e)
         {
             _contactsSource.DataSource = _contacts;
@@ -363,6 +297,36 @@ namespace ContactsManager
             txtSearch.Clear();
             UpdateCounts();
             DisplayStatus("Filter reset.");
+        }
+        private void dgContacts_SelectionChanged_1(object sender, EventArgs e)
+        {
+            if (_suppressSelectionChanged) return;
+            if (!_userClickedRow) return; 
+            if (dgContacts.SelectedRows.Count == 0) return;
+
+            var contact = dgContacts.SelectedRows[0].DataBoundItem as Contact;
+            if (contact == null) return;
+
+            txtFullName.Text = contact.FullName;
+            txtEmail.Text = contact.Email;
+            mtbPhone.Text = contact.Phone;
+            cmbGender.SelectedItem = contact.Gender;
+            dtpBirthDate.Value = contact.BirthDate ?? DateTime.Today;
+
+            DisplayStatus($"Selected: {contact.FullName} | Email: {contact.Email}");
+        }
+        private void dgContacts_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            _userClickedRow = true;
+        }
+
+        private void chkConfirmDelete_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkConfirmDelete.Checked)
+                DisplayStatus("Delete confirmation is enabled.");
+            else
+                DisplayStatus("Delete confirmation is disabled.");
         }
     }
 }
